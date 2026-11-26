@@ -1,8 +1,9 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { useSnakeStore } from '../../features/snake/store/useSnakeStore'
 import type { Direction } from '../../features/snake/model/types'
 import { BOARD_SIZE } from '../../features/snake/model/constants'
 import { useInterval } from '../../shared/hooks/useInterval'
+import { useSwipe } from '../../shared/hooks/useSwipe'
 import './GameBoard.css'
 
 const TICK_MS = 120
@@ -35,6 +36,17 @@ export function GameBoard() {
   const restart = useSnakeStore((state) => state.restart)
   const changeDirection = useSnakeStore((state) => state.changeDirection)
   const tick = useSnakeStore((state) => state.tick)
+  const boardRef = useRef<HTMLDivElement>(null)
+
+  const applyDirection = useCallback(
+    (direction: Direction) => {
+      start()
+      changeDirection(direction)
+    },
+    [start, changeDirection],
+  )
+
+  useSwipe(boardRef, applyDirection)
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -43,10 +55,9 @@ export function GameBoard() {
         return
       }
       event.preventDefault()
-      start()
-      changeDirection(direction)
+      applyDirection(direction)
     },
-    [start, changeDirection],
+    [applyDirection],
   )
 
   useEffect(() => {
@@ -76,10 +87,15 @@ export function GameBoard() {
       <header className="game__hud">
         <span className="game__score">Счёт: {score}</span>
         {status === 'idle' && (
-          <span className="game__hint">Нажмите стрелку или WASD, чтобы начать</span>
+          <span className="game__hint">Нажмите стрелку, WASD или свайпните, чтобы начать</span>
         )}
       </header>
-      <div className="game__board" role="grid" aria-label="Игровое поле змейки">
+      <div
+        className="game__board"
+        role="grid"
+        aria-label="Игровое поле змейки"
+        ref={boardRef}
+      >
         {cells}
         {status === 'gameover' && (
           <div className="game__overlay" role="alert">
@@ -90,6 +106,20 @@ export function GameBoard() {
             </button>
           </div>
         )}
+      </div>
+      <div className="game__controls" aria-label="Экранные кнопки направления">
+        <button type="button" className="game__pad-btn game__pad-btn--up" aria-label="Вверх" onClick={() => applyDirection('up')}>
+          ↑
+        </button>
+        <button type="button" className="game__pad-btn game__pad-btn--left" aria-label="Влево" onClick={() => applyDirection('left')}>
+          ←
+        </button>
+        <button type="button" className="game__pad-btn game__pad-btn--right" aria-label="Вправо" onClick={() => applyDirection('right')}>
+          →
+        </button>
+        <button type="button" className="game__pad-btn game__pad-btn--down" aria-label="Вниз" onClick={() => applyDirection('down')}>
+          ↓
+        </button>
       </div>
     </section>
   )
