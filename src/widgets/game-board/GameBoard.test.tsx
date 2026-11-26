@@ -42,4 +42,22 @@ describe('GameBoard', () => {
     expect(useSnakeStore.getState().status).toBe('playing')
     expect(useSnakeStore.getState().direction).toBe('up')
   })
+
+  it('свайп по доске запускает игру и меняет направление', () => {
+    render(<GameBoard />)
+    const board = screen.getByRole('grid')
+    fireEvent.touchStart(board, { changedTouches: [{ clientX: 200, clientY: 200 }] })
+    fireEvent.touchEnd(board, { changedTouches: [{ clientX: 200, clientY: 260 }] })
+    expect(useSnakeStore.getState().status).toBe('playing')
+    expect(useSnakeStore.getState().direction).toBe('down')
+  })
+
+  it('тап по экранной кнопке запускает игру и меняет направление в сторе', () => {
+    render(<GameBoard />)
+    fireEvent.click(screen.getByRole('button', { name: 'Вверх' }))
+    expect(useSnakeStore.getState().status).toBe('playing')
+    expect(useSnakeStore.getState().direction).toBe('up')
+    fireEvent.click(screen.getByRole('button', { name: 'Влево' }))
+    expect(useSnakeStore.getState().direction).toBe('left')
+  })
 })
