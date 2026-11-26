@@ -5,8 +5,12 @@
 ## Управление
 
 - **Стрелки** или **WASD** — движение
-- Первая клавиша запускает игру
+- **Свайп** по полю — движение на тач-устройствах
+- Экранные кнопки-стрелки под полем — на мобильных (показываются только на тач-устройствах)
+- Первая клавиша/свайп/тап запускает игру
 - **«Начать заново»** — рестарт после Game Over
+
+> Мобильная поддержка: свайпы (порог 30 px, `useSwipe` в `src/shared/hooks/`), экранный D-pad через медиа-запрос `(hover: none), (pointer: coarse)`, скролл при свайпе отключён (`touch-action: none` на доске).
 
 ## Стек
 
@@ -19,7 +23,7 @@
 - `src/widgets/game-board/` — виджет игры: рендер доски, клавиатура, Game Over, счёт
 - `src/features/snake/model/` — чистая игровая логика (без React): `step`, `checkCollision`, `spawnFood` (детерминированный rng), константы
 - `src/features/snake/store/` — zustand-стор и actions (`start`, `restart`, `changeDirection`, `tick`)
-- `src/shared/` — `useInterval`, тестовый setup
+- `src/shared/` — `useInterval`, `useSwipe` (свайп-управление), тестовый setup
 
 Игровой тик (≈120 мс) — через `useInterval` в компоненте, не в сторе.
 
