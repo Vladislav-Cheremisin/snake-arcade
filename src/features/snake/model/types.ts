@@ -5,7 +5,7 @@ export interface Point {
   y: number
 }
 
-export type GameStatus = 'idle' | 'playing' | 'gameover'
+export type GameStatus = 'idle' | 'playing' | 'paused' | 'gameover'
 
 /** Тип генератора случайных чисел: детерминированный rng подаётся в тестах. */
 export type Rng = () => number
