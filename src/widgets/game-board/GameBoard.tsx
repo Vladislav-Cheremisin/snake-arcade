@@ -71,6 +71,17 @@ export function GameBoard() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [handleKeyDown])
 
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden && useSnakeStore.getState().status === 'playing') {
+        useSnakeStore.getState().togglePause()
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () =>
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+  }, [])
+
   useInterval(tick, status === 'playing' ? TICK_MS : null)
 
   const snakeCells = new Set(snake.map((segment) => cellIndex(segment.x, segment.y)))
