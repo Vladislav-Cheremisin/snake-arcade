@@ -35,6 +35,7 @@ export function GameBoard() {
   const start = useSnakeStore((state) => state.start)
   const restart = useSnakeStore((state) => state.restart)
   const changeDirection = useSnakeStore((state) => state.changeDirection)
+  const togglePause = useSnakeStore((state) => state.togglePause)
   const tick = useSnakeStore((state) => state.tick)
   const boardRef = useRef<HTMLDivElement>(null)
 
@@ -50,6 +51,11 @@ export function GameBoard() {
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
+      if (event.key === ' ' || event.key === 'p' || event.key === 'P') {
+        event.preventDefault()
+        togglePause()
+        return
+      }
       const direction = KEY_TO_DIRECTION[event.key]
       if (!direction) {
         return
@@ -57,7 +63,7 @@ export function GameBoard() {
       event.preventDefault()
       applyDirection(direction)
     },
-    [applyDirection],
+    [applyDirection, togglePause],
   )
 
   useEffect(() => {
@@ -86,6 +92,15 @@ export function GameBoard() {
     <section className="game">
       <header className="game__hud">
         <span className="game__score">Счёт: {score}</span>
+        <button
+          type="button"
+          className="game__pause"
+          onClick={togglePause}
+          disabled={status !== 'playing' && status !== 'paused'}
+          aria-pressed={status === 'paused'}
+        >
+          {status === 'paused' ? 'Продолжить' : 'Пауза'}
+        </button>
         {status === 'idle' && (
           <span className="game__hint">Нажмите стрелку, WASD или свайпните, чтобы начать</span>
         )}
@@ -97,6 +112,14 @@ export function GameBoard() {
         ref={boardRef}
       >
         {cells}
+        {status === 'paused' && (
+          <div className="game__overlay" role="status">
+            <h2 className="game__pause-title">Пауза</h2>
+            <button type="button" className="game__restart" onClick={togglePause}>
+              Продолжить
+            </button>
+          </div>
+        )}
         {status === 'gameover' && (
           <div className="game__overlay" role="alert">
             <h2 className="game__over-title">Игра окончена</h2>
