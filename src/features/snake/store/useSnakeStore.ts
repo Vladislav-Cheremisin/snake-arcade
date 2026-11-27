@@ -10,6 +10,7 @@ export interface SnakeStore extends ReturnType<typeof createInitialState> {
   start: () => void
   restart: () => void
   changeDirection: (direction: Direction) => void
+  togglePause: () => void
   tick: (rng?: Rng) => void
 }
 
@@ -35,6 +36,15 @@ export const useSnakeStore = create<SnakeStore>((set, get) => ({
       return
     }
     set({ direction })
+  },
+
+  togglePause: () => {
+    const { status } = get()
+    if (status === 'playing') {
+      set({ status: 'paused' })
+    } else if (status === 'paused') {
+      set({ status: 'playing' })
+    }
   },
 
   tick: (rng?: Rng) => {
