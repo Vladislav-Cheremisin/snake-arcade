@@ -60,4 +60,27 @@ describe('GameBoard', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Влево' }))
     expect(useSnakeStore.getState().direction).toBe('left')
   })
+
+  it('кнопка паузы в HUD переключает паузу по клику', () => {
+    render(<GameBoard />)
+    act(() => {
+      useSnakeStore.setState({ status: 'playing' })
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Пауза' }))
+    expect(useSnakeStore.getState().status).toBe('paused')
+    expect(screen.getByRole('status')).toHaveTextContent('Пауза')
+    fireEvent.click(screen.getAllByRole('button', { name: 'Продолжить' })[0])
+    expect(useSnakeStore.getState().status).toBe('playing')
+  })
+
+  it('Space переключает паузу во время игры', () => {
+    render(<GameBoard />)
+    act(() => {
+      useSnakeStore.setState({ status: 'playing' })
+    })
+    fireEvent.keyDown(window, { key: ' ' })
+    expect(useSnakeStore.getState().status).toBe('paused')
+    fireEvent.keyDown(window, { key: ' ' })
+    expect(useSnakeStore.getState().status).toBe('playing')
+  })
 })

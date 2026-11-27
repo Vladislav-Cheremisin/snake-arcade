@@ -44,4 +44,33 @@ describe('useSnakeStore', () => {
     expect(state.score).toBe(0)
     expect(state.snake).toHaveLength(3)
   })
+
+  it('togglePause переключает playing <-> paused', () => {
+    useSnakeStore.getState().start()
+    useSnakeStore.getState().togglePause()
+    expect(useSnakeStore.getState().status).toBe('paused')
+    useSnakeStore.getState().togglePause()
+    expect(useSnakeStore.getState().status).toBe('playing')
+  })
+
+  it('togglePause игнорируется в idle и gameover', () => {
+    expect(useSnakeStore.getState().status).toBe('idle')
+    useSnakeStore.getState().togglePause()
+    expect(useSnakeStore.getState().status).toBe('idle')
+    useSnakeStore.setState({ status: 'gameover' })
+    useSnakeStore.getState().togglePause()
+    expect(useSnakeStore.getState().status).toBe('gameover')
+  })
+
+  it('tick в паузе не двигает змейку и не меняет счёт', () => {
+    useSnakeStore.getState().start()
+    useSnakeStore.getState().togglePause()
+    const snakeBefore = useSnakeStore.getState().snake.map((s) => ({ ...s }))
+    const scoreBefore = useSnakeStore.getState().score
+    useSnakeStore.getState().tick(rng)
+    const after = useSnakeStore.getState()
+    expect(after.status).toBe('paused')
+    expect(after.snake).toEqual(snakeBefore)
+    expect(after.score).toBe(scoreBefore)
+  })
 })
